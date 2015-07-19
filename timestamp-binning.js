@@ -6,13 +6,14 @@
 //Update documentation to npm and github
 //Publish article on blog ;-)
 
-module.exports = function(evalPeriodString, binSizeString, excludeBursts) {
+module.exports = function(evalPeriodString, binSizeString, excludeBursts, useNow) {
 	if (typeof evalPeriodString === "undefined") evalPeriodString = "week";
 	if (typeof binSizeString === "undefined") binSizeString = "hour";	
 	//the parameter excludeBursts allows to disregard any additional timestamps
 	//for a bin that had already seen a timestamp. This makes the histrogram
 	//to only have values 0 or 1.
 	if (typeof excludeBursts === "undefined") excludeBursts = false;
+
 
 	//the week starts on Monday at 00:00 am
 	//calculate the reference date (the next Monday based on the current date)
@@ -22,7 +23,7 @@ module.exports = function(evalPeriodString, binSizeString, excludeBursts) {
 	var day = now.getDate();
 	var month = now.getMonth();
 	var year = now.getFullYear();	
-	var refDate = new Date((new Date(year, month, day, 0,0,0,0)).getTime() + oneDay * (8-dayOfWeek));
+	var refDate = (useNow)? now : new Date((new Date(year, month, day, 0,0,0,0)).getTime() + oneDay * (8-dayOfWeek));
 	
 	var binSize = 3600000; //in msec, default: 1000 * 60 * 60 = 1 hour	
 	//day, hour, minute, second	
@@ -46,7 +47,7 @@ module.exports = function(evalPeriodString, binSizeString, excludeBursts) {
 	//week, day, hour
 	switch (evalPeriodString.toLowerCase()) {
         case "year": 
-            evalPeriod = 31536000000 / binSize;
+            evalPeriod = 31556926000 / binSize;
             break;
         case "month": 
             evalPeriod = 2592000000 / binSize;
